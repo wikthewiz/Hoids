@@ -1,0 +1,21 @@
+name:           Hoids
+version:        0.1
+cabal-version:  >=1.2
+build-type:     Simple
+author:         fimiljen
+data-files:     src/Main.hs
+
+executable Hoids
+  hs-source-dirs:  src
+  main-is:         Main.hs
+  build-depends:   base >= 4
+  ghc-options:     -Wall
+
+library 
+  build-depends:   
+                   base >= 4,
+                   GLUT >= 2.1,
+                   OpenGL >= 2.2
+  hs-source-dirs:  src
+  ghc-options:     -Wall
+
