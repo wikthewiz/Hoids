@@ -13,3 +13,14 @@ Using Eclipse these use following steps to set up you environment.
 
 Cabal is used to package the application so don't forget to add to Hoids.cabal
 
+Building
+========
+
+You can fairly easy build it using:
+```
+ghc -package GLUT Main.hs -o Hoids
+```
+
+To package it we use cabal
+
+
