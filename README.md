@@ -18,7 +18,7 @@ Building
 
 You can fairly easy build it using:
 ```
-ghc -package GLUT Main.hs -o Hoids
+ghc -package GLUT src/Main.hs -o Hoids
 ```
 
 To package it we use cabal
