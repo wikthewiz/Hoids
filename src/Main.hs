@@ -21,8 +21,7 @@ close :: IO ()
 close = do
   putStrLn "exit"
   flush
--- Use this function tp move and impact the displaying.
--- There should be no things done i display
+-- Use this function to move and impact the displaying.
 frameUpdate :: IO ()
 frameUpdate = do
   flush
@@ -34,5 +33,17 @@ display :: IO ()
 display = do
   clearColor $= bgColor
   clear [ ColorBuffer, DepthBuffer ]
+  renderPrimitive Polygon $ do
+        color $ (Color4 (0.0::GLfloat) 0 0 0.4)
+        mapM_ (\(x, y, z)->vertex$Vertex3 x y z) $ circle 0.1 (0,0,-0.4)
   loadIdentity
+  flush
   swapBuffers
+
+circle :: GLfloat -> (GLfloat,GLfloat,GLfloat) -> [(GLfloat,GLfloat,GLfloat)]
+circle r (x,y,z) = map (\n -> ( xCalc(n) * r * 0.588235294 + x, yCalc(n) * r + y,0.0 * r + z )) [1..nrOfLines]
+        where 
+                nrOfLines = 100
+                xCalc n = sin(2*pi*n/nrOfLines)
+                yCalc n = cos(2*pi*n/nrOfLines) 
+  
