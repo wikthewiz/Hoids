@@ -24,14 +24,14 @@ close = do
   putStrLn "exit"
   flush
 -- Use this function to move and impact the displaying.
-
+frameUpdate :: IORef GLfloat -> IO()
 frameUpdate world = do
   postRedisplay Nothing
 
 bgColor :: Color4 GLfloat   
 bgColor = (Color4 1 (242/255) (229/255) 0.5)
 
-
+display :: IORef GLfloat -> IO()
 display world = do
   w <- get world
   world $=! updateWorld(w)
@@ -48,6 +48,7 @@ circle r (x,y,z) = map (\n -> ( xCalc(n) * r * 400/680 + x, yCalc(n) * r + y,0.0
         where 
                 nrOfLines = 100
                 xCalc n = sin(2*pi*n/nrOfLines)
-                yCalc n = cos(2*pi*n/nrOfLines) 
+                yCalc n = cos(2*pi*n/nrOfLines)
 
+updateWorld :: Fractional a => a -> a
 updateWorld world = world + 0.001
