@@ -10,6 +10,9 @@ executable Hoids
   main-is:         Main.hs
   build-depends:   base >= 4
   ghc-options:     -Wall
+  other-modules:   
+                   BoidShape,
+                   BoidWorld
 
 library 
   build-depends:   
@@ -18,4 +21,7 @@ library
                    OpenGL >= 2.2
   hs-source-dirs:  src
   ghc-options:     -Wall
+  other-modules:   
+                   BoidShape,
+                   BoidWorld
 

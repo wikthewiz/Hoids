@@ -3,6 +3,9 @@ import Graphics.Rendering.OpenGL
 import Graphics.UI.GLUT
 import Data.IORef
 
+import BoidShape
+import BoidWorld
+
 main :: IO ()
 main = do
   (progname, _) <- getArgsAndInitialize
@@ -12,65 +15,46 @@ main = do
   windowSize  $= (Size 680 400)
   windowPosition $= (Position 500 500)
   cursor $= None
-  world <- newIORef 1.0
+  world <- newIORef (createWorld 12)
   closeCallback $= Just close
   displayCallback $= display world
   idleCallback $= Just (frameUpdate world)
   mainLoop
 
-boidRadious = 0.1
-
-createBoids :: Int -> Vector -> [Boid]
-createBoids 0 _ = []
-createBoids nrOfBoids prevPos =  let boid = createBoid
-                                 in  boid : createBoids (nrOfBoids - 1) (pos boid)
-      where
-        createBoid =  let x = prevPos
-                      in 
-                        Boid { 
-                              direction = Vector 0 0 0,
-                              pos = Vector x + boidRadious y + boidRadious z + boidRadious 
-                            } 
- 
-
-createWorld nrOfBoids = World {boids = createBoids nrOfBoids $ Vector 0 0 0 }
 
 close :: IO ()
 close = do
         putStrLn "exit"
         flush
+        
 -- Use this function to move and impact the displaying.
-frameUpdate :: IORef GLfloat -> IO()
+frameUpdate :: IORef World -> IO()
 frameUpdate world = do
         postRedisplay Nothing
 
 bgColor :: Color4 GLfloat   
 bgColor = (Color4 1 (242/255) (229/255) 0.5)
 
-display :: IORef GLfloat -> IO()
+
+--drawWorld :: World -> [(GLfloat,GLfloat,GLfloat)]
+--drawWorld (World bs) = do 
+--    renderPrimitive Polygon $ do
+--     (map boid  [(x,y,z) |  (Boid _ (Vector x y z)) <- bs ])
+
+display :: IORef World -> IO()
 display world = do
         w <- get world
         world $=! updateWorld(w)
         clearColor $= bgColor
         clear [ ColorBuffer, DepthBuffer ]
         loadIdentity
-        preservingMatrix $ renderPrimitive Polygon $ do
-                color $ (Color4 (0.0::GLfloat) 0 0 0.4)
-                mapM_ (\(x, y, z)->vertex$Vertex3 x y z) $ circle (w*0.1) (0,0,-0.4)
+        do mapM_ (\(x, y, z)-> preservingMatrix $ do
+            color $ Color3 ((x+1.0)/2.0) ((y+1.0)/2.0) ((z+1.0)/2.0)
+            translate $ Vector3 x y z
+            boid boidRadious
+            ) $ getPoints w
         swapBuffers
 
-circle :: GLfloat -> (GLfloat,GLfloat,GLfloat) -> [(GLfloat,GLfloat,GLfloat)]
-circle r (x,y,z) = map (\n -> ( xCalc(n) * r * 400/680 + x, yCalc(n) * r + y,0.0 * r + z )) [1..nrOfLines]
-        where 
-                nrOfLines = 100
-                xCalc n = sin(2*pi*n/nrOfLines)
-                yCalc n = cos(2*pi*n/nrOfLines)
 
-updateWorld :: Fractional a => a -> a
-updateWorld world = world + 0.001
-
-data Vector = Vector GLfloat GLfloat GLfloat deriving (Show)
-data Boid  = Boid { direction :: Vector
-                    , pos:: Vector 
-                    } deriving (Show)
-data World = World { boids :: [Boid] }  deriving (Show)
+updateWorld :: a -> a
+updateWorld world = world
