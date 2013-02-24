@@ -13,6 +13,9 @@ Using Eclipse these use following steps to set up you environment.
 
 Cabal is used to package the application so don't forget to add to Hoids.cabal
 
+Using Emacs:
+ ...
+
 Building
 ========
 
