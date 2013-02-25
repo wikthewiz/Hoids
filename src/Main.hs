@@ -18,7 +18,7 @@ main = do
   world <- newIORef (createWorld 12)
   closeCallback $= Just close
   displayCallback $= display world
-  idleCallback $= Just (frameUpdate world)
+  idleCallback $= Just (idle world)
   mainLoop
 
 
@@ -44,7 +44,6 @@ bgColor = (Color4 1 (242/255) (229/255) 0.5)
 display :: IORef World -> IO()
 display world = do
         w <- get world
-        world $=! updateWorld(w)
         clearColor $= bgColor
         clear [ ColorBuffer, DepthBuffer ]
         loadIdentity
@@ -52,9 +51,32 @@ display world = do
             color $ Color3 ((x+1.0)/2.0) ((y+1.0)/2.0) ((z+1.0)/2.0)
             translate $ Vector3 x y z
             boid boidRadious
+            color $ Color3 (0.0::GLfloat) (0.0::GLfloat) (0.0::GLfloat) --set outline color to black
+            boidFrame boidRadious
             ) $ getPoints w
         swapBuffers
 
 
+idle world = do
+  w <- get world
+  world $=! (updateWorld w)
+  postRedisplay Nothing
+ 
+ 
 updateWorld :: a -> a
-updateWorld world = world
+updateWorld (World bs) =  [ moveBoid b | b <-bs]
+
+--moveInCircle r (Boid _ (Vector x y z)) =
+getCirclePos r x y z = map (\n -> ( xCalc(n) * r * 400/680 + x, yCalc(n) * r + y,0.0 * r + z )) [1..nrOfLines]
+        where 
+                nrOfLines = 100
+                xCalc n = sin(2*pi*n/nrOfLines)
+                yCalc n = cos(2*pi*n/nrOfLines)
+                r = boidRadious     
+--circle :: (GLfloat,GLfloat,GLfloat) -> [(GLfloat,GLfloat,GLfloat)]
+--circle (x,y,z) = map (\n -> ( xCalc(n) * r * 400/680 + x, yCalc(n) * r + y,0.0 * r + z )) [1..nrOfLines]
+--        where 
+--                nrOfLines = 100
+--                xCalc n = sin(2*pi*n/nrOfLines)
+--                yCalc n = cos(2*pi*n/nrOfLines)
+--                r = boidRadious
