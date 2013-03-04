@@ -26,11 +26,3 @@ cube w = vertify3
 pyramid d = vertify3 
   [(d  * 400/680,d,0),(0,d,0),(-d  * 400/680,0,0),
    (d  * 400/680,d,0),(0,0,d),(-d  * 400/680,0,0)]
-
---circle :: (GLfloat,GLfloat,GLfloat) -> [(GLfloat,GLfloat,GLfloat)]
---circle (x,y,z) = map (\n -> ( xCalc(n) * r * 400/680 + x, yCalc(n) * r + y,0.0 * r + z )) [1..nrOfLines]
---        where 
---                nrOfLines = 100
---                xCalc n = sin(2*pi*n/nrOfLines)
---                yCalc n = cos(2*pi*n/nrOfLines)
---                r = boidRadious

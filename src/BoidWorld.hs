@@ -1,4 +1,4 @@
-module BoidWorld(moveBoid, getPoints,createWorld,World,Boid,Vector) where
+module BoidWorld where
 
 import Graphics.Rendering.OpenGL
 import BoidShape
@@ -9,6 +9,7 @@ data Boid  = Boid { direction :: Vector
                     } deriving (Show)
 data World = World { boids :: [Boid] }  deriving (Show)
 
+
 getPoints :: World -> [(GLfloat,GLfloat,GLfloat)]
 getPoints (World bs) = [(x,y,z) |  (Boid _ (Vector x y z)) <- bs ]
 
@@ -16,25 +17,40 @@ createBoids :: Int -> Vector -> [Boid]
 createBoids 0 _ = []
 createBoids nrOfBoids (Vector x y z) = let b = createBoid newPos
                                         in  b : createBoids (nrOfBoids - 1) (pos b)
-    where
+    where 
       newPos = ((x + boidRadious),(y + boidRadious),(z + boidRadious))
- 
-createBoid (x,y,z) = Boid { 
- direction = Vector 0 0 0,
- pos = Vector x y z
- }
 
+
+createBoid::(GLfloat,GLfloat,GLfloat) -> Boid
+createBoid (x,y,z) = 
+  Boid { 
+        direction = unit $ Vector 1 1 1,
+        pos = Vector x y z
+  }
+
+createBoidWithDir:: (GLfloat,GLfloat,GLfloat) -> (GLfloat,GLfloat,GLfloat) -> Boid 
 createBoidWithDir (dx,dy,dz) (x,y,z) = 
-  Boid { direction = Vector dx dy dz,
-          pos = Vector x y z
-        }
+  Boid { 
+    direction = unit $ Vector dx dy dz,
+    pos = Vector x y z
+  }
 
 createWorld :: Int -> World
 createWorld nrOfBoids = World {boids = createBoids nrOfBoids $ Vector 0 0 0 }
 
-moveBoid (Vector dx dy dz )
+unit :: Vector -> Vector
+unit (Vector x y z) = Vector (x/l) (y/l) (z/l)
+  where
+    l = sqrt(x * x + y * y + z * z)
+    
+moveBoid:: GLfloat -> Boid -> Boid
+moveBoid l
          (Boid (Vector dirX dirY dirZ)
-                (Vector x y z)) = createBoidWithDir (x + (dirX * dx), y + (dirY * dy), z + (dirZ * dz))
+                (Vector x y z)) = createBoidWithDir (dirX,dirY,dirZ) (newX,newY ,newZ)
+                where 
+                  newX = x + dirX * l
+                  newY = y + dirY * l
+                  newZ = z + dirZ * l
 
 
 x_rotate a = [1,0      ,0     ,
@@ -47,16 +63,18 @@ y_rotate a = [cos(a),0,-sin(a),
 
 z_rotate a = [cos(a) ,sin(a),0,
               -sin(a),cos(a),0, 
-              0      ,0     ,1] 
+              0      ,0     ,1]
+ 
 multi :: Vector -> [GLfloat] -> Vector
 multi (Vector x y z) m = Vector calcX calcY calcZ
         where 
-                calcX = x * m[0] + x * m[3] + x * m[6]  
-                calcY = y * m[1] + y * m[4] + y * m[7]
-                calcZ = z * m[2] + z * m[5] + z * m[8]
+                calcX = x * m!!0 + x * m!!3 + x * m!!6  
+                calcY = y * m!!1 + y * m!!4 + y * m!!7
+                calcZ = z * m!!2 + z * m!!5 + z * m!!8
                
         
-turnBoid rotate_matrix
-         (Boid (Vector dirX dirY dirZ)
-                (Vector x y z)) = createBoidWithDir (x + (dirX * dx), y + (dirY * dy), z + (dirZ * dz))
+turnBoid rotate_matrix (Boid dirV (Vector x y z)) = 
+  createBoidWithDir (dirX, dirY, dirZ) (x,y,z)
+    where
+      (Vector dirX dirY dirZ) = multi dirV rotate_matrix
 

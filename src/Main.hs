@@ -36,11 +36,6 @@ bgColor :: Color4 GLfloat
 bgColor = (Color4 1 (242/255) (229/255) 0.5)
 
 
---drawWorld :: World -> [(GLfloat,GLfloat,GLfloat)]
---drawWorld (World bs) = do 
---    renderPrimitive Polygon $ do
---     (map boid  [(x,y,z) |  (Boid _ (Vector x y z)) <- bs ])
-
 display :: IORef World -> IO()
 display world = do
         w <- get world
@@ -56,27 +51,18 @@ display world = do
             ) $ getPoints w
         swapBuffers
 
-
 idle world = do
   w <- get world
   world $=! (updateWorld w)
   postRedisplay Nothing
  
  
-updateWorld :: a -> a
-updateWorld (World bs) =  [ moveBoid b | b <-bs]
-
---moveInCircle r (Boid _ (Vector x y z)) =
-getCirclePos r x y z = map (\n -> ( xCalc(n) * r * 400/680 + x, yCalc(n) * r + y,0.0 * r + z )) [1..nrOfLines]
-        where 
-                nrOfLines = 100
-                xCalc n = sin(2*pi*n/nrOfLines)
-                yCalc n = cos(2*pi*n/nrOfLines)
-                r = boidRadious     
---circle :: (GLfloat,GLfloat,GLfloat) -> [(GLfloat,GLfloat,GLfloat)]
---circle (x,y,z) = map (\n -> ( xCalc(n) * r * 400/680 + x, yCalc(n) * r + y,0.0 * r + z )) [1..nrOfLines]
---        where 
---                nrOfLines = 100
---                xCalc n = sin(2*pi*n/nrOfLines)
---                yCalc n = cos(2*pi*n/nrOfLines)
---                r = boidRadious
+updateWorld :: World -> World
+updateWorld (World bs) =
+  World {
+    boids = [ moveBoid length $ turnBoid matrix b | b <-bs]
+  }
+    where
+        ticks = 1000
+        length =  2 * boidRadious * pi / ticks
+        matrix =  x_rotate $ 2 * pi / ticks
