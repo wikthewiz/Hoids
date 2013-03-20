@@ -53,8 +53,8 @@ moveBoid l
                   newZ = z + dirZ * l
 
 
-x_rotate a = [1,0      ,0     ,
-              0,cos(a) ,sin(a),
+x_rotate a = [1,0      ,0      ,
+              0,cos(a) ,sin(a) ,
               0,-sin(a),cos(a) ]
               
 y_rotate a = [cos(a),0,-sin(a),
@@ -65,16 +65,16 @@ z_rotate a = [cos(a) ,sin(a),0,
               -sin(a),cos(a),0, 
               0      ,0     ,1]
  
-multi :: Vector -> [GLfloat] -> Vector
-multi (Vector x y z) m = Vector calcX calcY calcZ
+multi :: [GLfloat] -> Vector -> Vector
+multi  m (Vector x y z) = Vector calcX calcY calcZ
         where 
-                calcX = x * m!!0 + x * m!!3 + x * m!!6  
-                calcY = y * m!!1 + y * m!!4 + y * m!!7
-                calcZ = z * m!!2 + z * m!!5 + z * m!!8
+                calcX = m!!0 * x + m!!1 * y + m!!2 * z  
+                calcY = m!!3 * x + m!!4 * y + m!!5 * z
+                calcZ = m!!6 * x + m!!7 * y + m!!8 * z
                
         
 turnBoid rotate_matrix (Boid dirV (Vector x y z)) = 
   createBoidWithDir (dirX, dirY, dirZ) (x,y,z)
     where
-      (Vector dirX dirY dirZ) = multi dirV rotate_matrix
+      (Vector dirX dirY dirZ) = multi rotate_matrix dirV
 

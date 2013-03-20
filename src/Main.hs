@@ -12,10 +12,10 @@ main = do
   createWindow "Hoids"
   initialDisplayMode $= [WithDepthBuffer, DoubleBuffered, RGBMode]
   depthFunc  $= Just Less
-  windowSize  $= (Size 680 400)
+  windowSize  $= (Size 500 500)
   windowPosition $= (Position 500 500)
   cursor $= None
-  world <- newIORef (createWorld 12)
+  world <- newIORef (createWorld 2)
   closeCallback $= Just close
   displayCallback $= display world
   idleCallback $= Just (idle world)
@@ -42,12 +42,15 @@ display world = do
         clearColor $= bgColor
         clear [ ColorBuffer, DepthBuffer ]
         loadIdentity
+        preservingMatrix $ do
+        scale 0.3 0.3 (0.3::GLfloat)
+        rotate (90) $ Vector3 1 1 (-2::GLfloat)
         do mapM_ (\(x, y, z)-> preservingMatrix $ do
-            color $ Color3 ((x+1.0)/2.0) ((y+1.0)/2.0) ((z+1.0)/2.0)
+            color $ Color3 ((x+1)/2.0) ((y)/2.0) ((z+30.0)/2.0)
             translate $ Vector3 x y z
-            boid boidRadious
+            boid
             color $ Color3 (0.0::GLfloat) (0.0::GLfloat) (0.0::GLfloat) --set outline color to black
-            boidFrame boidRadious
+            boidFrame 
             ) $ getPoints w
         swapBuffers
 
@@ -60,9 +63,9 @@ idle world = do
 updateWorld :: World -> World
 updateWorld (World bs) =
   World {
-    boids = [ moveBoid length $ turnBoid matrix b | b <-bs]
+    boids = [turnBoid matrix b | b <-bs]
   }
     where
         ticks = 1000
         length =  2 * boidRadious * pi / ticks
-        matrix =  x_rotate $ 2 * pi / ticks
+        matrix =    x_rotate $ pi/3

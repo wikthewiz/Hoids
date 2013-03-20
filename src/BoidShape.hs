@@ -1,15 +1,16 @@
 module BoidShape (boid, boidRadious,boidFrame) where
 
 import Graphics.Rendering.OpenGL
+import Graphics.UI.GLUT.Objects
+
 
 boidRadious:: GLfloat
-boidRadious = 0.1
+boidRadious = (sqrt 3) * 0.3
 
 --boid :: (Num a, VertexComponent a) => a -> IO ()
-boid w = do 
-  renderPrimitive Quads $ do (pyramid w)
+boid = renderObject  Solid Tetrahedron
   
-boidFrame w = renderPrimitive Lines $ pyramid w
+boidFrame = renderObject Wireframe Tetrahedron
 
 vertify3 :: [(GLfloat,GLfloat,GLfloat)] -> IO ()
 vertify3 verts = sequence_ $ map (\(a,b,c) -> vertex $ Vertex3 a b c) verts 
